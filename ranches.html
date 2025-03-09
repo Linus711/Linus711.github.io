@@ -3,18 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kepler.gl Map Viewer</title>
-
-    <!-- Load Kepler.gl and Mapbox -->
-    <link href="https://unpkg.com/mapbox-gl/dist/mapbox-gl.css" rel="stylesheet">
-    <script src="https://unpkg.com/mapbox-gl/dist/mapbox-gl.js"></script>
-    <script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin></script>
-    <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin></script>
-    <script src="https://unpkg.com/redux@4.2.1/dist/redux.js" crossorigin></script>
-    <script src="https://unpkg.com/react-redux@8.1.2/dist/react-redux.min.js" crossorigin></script>
-    <script src="https://unpkg.com/styled-components@6.1.8/dist/styled-components.min.js" crossorigin></script>
-    <script src="https://unpkg.com/kepler.gl@3.1.0/umd/keplergl.min.js" crossorigin></script>
-
+    <title>Kepler.gl Map Embed</title>
     <style>
         body {
             margin: 0;
@@ -25,37 +14,15 @@
             font-size: 20px;
             padding: 10px;
         }
-        #map-container {
+        iframe {
             width: 100%;
-            height: 80vh; /* Adjust height as needed */
+            height: 90vh; /* Adjust height if needed */
+            border: none;
         }
     </style>
 </head>
 <body>
     <h1>Kepler.gl Map Viewer</h1>
-    <iframe id="map-container"></iframe>
-
-    <script>
-        // URL of your uploaded JSON file (replace with your actual GitHub Pages link)
-        const jsonUrl = "https://Linus711.github.io/kepler.gl.json";
-
-        async function loadMap() {
-            try {
-                const response = await fetch(jsonUrl);
-                const mapData = await response.json();
-
-                // Convert JSON into a data URL for embedding in iframe
-                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(mapData));
-                
-                // Set iframe source to Kepler.gl map with JSON data
-                document.getElementById("map-container").src = `https://kepler.gl/demo/map?json=${dataStr}`;
-            } catch (error) {
-                console.error("Error loading map JSON:", error);
-                document.getElementById("map-container").innerHTML = "Failed to load map.";
-            }
-        }
-
-        loadMap();
-    </script>
+    <iframe src="https://Linus711.github.io/ranches_map.html/" allowfullscreen></iframe>
 </body>
 </html>

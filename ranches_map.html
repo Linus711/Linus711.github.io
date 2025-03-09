@@ -78,6 +78,20 @@
         </script>
       </head>
       <body>
+
+        <script>
+          function resizeCanvas() {
+            let canvas = document.querySelector("canvas");
+            if (canvas) {
+              canvas.style.width = "100%";
+              canvas.style.height = "100vh";  // Prevents overflow in portrait
+            }
+          }
+        
+          window.addEventListener("resize", resizeCanvas);
+          window.addEventListener("load", resizeCanvas);
+        </script>
+        
         <!-- We will put our React component inside this div. -->
         <div id="app">
           <!-- Kepler.gl map will be placed here-->

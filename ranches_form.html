@@ -349,26 +349,19 @@
     fetch("https://script.google.com/macros/s/AKfycbzF3vn9IR4J6ZznIwgP_oTfIyhN44u9PNVYFOWXW1jJeEDvkO03VZboGO0uHbRsEfBYgQ/exec", {
       method: "POST",
       headers: {
-        "Content-Type": "text/plain;charset=utf-8"  // 🔑 This avoids CORS preflight
+        "Content-Type": "text/plain;charset=utf-8"
       },
       body: JSON.stringify(meta),
-      redirect: "follow"  // Optional but helpful for Google Script redirects
+      mode: "no-cors",
+      redirect: "follow"
     })
-    .then(res => res.json())
-    .then(resp => {
-      if (resp.success) {
-        alert("✅ Data submitted to Google Sheet!");
-      } else {
-        alert("❌ Error from server: " + (resp.error || "unknown error"));
-      }
+    .then(() => {
+      alert("✅ Data submitted to Google Sheet!");
     })
     .catch(err => {
       console.error("❌ Network error:", err);
-      alert("❌ Network error: " + err.message);
+      alert("❌ Submission failed: " + err.message);
     });
-
-  
-
 
   }
 

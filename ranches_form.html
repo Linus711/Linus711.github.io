@@ -293,7 +293,34 @@
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+
+    fetch("https://script.google.com/macros/s/AKfycbzcN6yboDHdlPKCl0SMmxN9TLqcrdqdhEWxKP9Sot-huaVI7GLlrfvn64a3EYOmGJ4Vgw/exec", {
+      method: "POST",
+      headers: {
+        "Content-Type": "text/plain;charset=utf-8"  // 🔑 This avoids CORS preflight
+      },
+      body: JSON.stringify(meta),
+      redirect: "follow"  // Optional but helpful for Google Script redirects
+    })
+    .then(res => res.json())
+    .then(resp => {
+      if (resp.success) {
+        alert("✅ Data submitted to Google Sheet!");
+      } else {
+        alert("❌ Error from server: " + (resp.error || "unknown error"));
+      }
+    })
+    .catch(err => {
+      console.error("❌ Network error:", err);
+      alert("❌ Network error: " + err.message);
+    });
+
+
   }
+
+
+
+
 </script>
 
 </body>

@@ -348,6 +348,7 @@
 
     fetch("https://script.google.com/macros/s/AKfycbzcN6yboDHdlPKCl0SMmxN9TLqcrdqdhEWxKP9Sot-huaVI7GLlrfvn64a3EYOmGJ4Vgw/exec", {
       method: "POST",
+      mode: "no-cors",
       headers: {
         "Content-Type": "text/plain;charset=utf-8"  // 🔑 This avoids CORS preflight
       },

@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta charset="UTF-8">
   <title>Ranch Cow Tracker</title>
   <style>
@@ -11,43 +12,100 @@
       overflow-x: auto;
     }
   
+    .table-scroll {
+      max-height: 600px;
+      overflow-y: auto;
+      overflow-x: auto;
+      border: 1px solid #ccc;
+      width: 100%;
+    }
+  
     table {
       border-collapse: collapse;
       width: 100%;
       table-layout: fixed;
+      min-width: 1400px; /* Enables horizontal scroll */
     }
   
+    /* Default cell styles */
     th, td {
       border: 1px solid #999;
       text-align: center;
       padding: 4px;
       font-size: 13px;
+      box-sizing: border-box;
     }
   
-    th {
+    /* Sticky merged top headers (e.g. Taureaux) */
+    thead tr:first-child th {
       position: sticky;
       top: 0;
-      background: #fff;
-      z-index: 2;
+      background: white;
+      z-index: 3;
+      height: 28px;
+      line-height: 28px;
     }
   
-    th[rowspan="2"] {
-      width: 150px;
+    /* Sticky subheaders (e.g. 6, 7, 8...) */
+    thead tr:nth-child(2) th {
+      position: sticky;
+      top: 28px;
+      background: white;
+      z-index: 2;
+      height: 28px;
+      line-height: 28px;
+    }
+  
+    /* Sticky first column (event labels) */
+    thead th:first-child,
+    tbody td:first-child {
+      position: sticky;
+      left: 0;
+      background: white;
+      z-index: 4;
       text-align: left;
+      width: 180px;
+      min-width: 300px;
+      max-width: 300px;
+
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      height: 28px;
+      line-height: 28px;
     }
 
   
-    select, input[type="text"] {
-      margin: 5px 10px 15px 0;
-      padding: 5px;
+    /* Default width for regular columns (non-inputs) */
+    td:not(.cow-cell):not(:first-child),
+    th:not(:first-child):not([colspan]) {
+      min-width: 80px;
     }
   
-    button {
-      margin-top: 20px;
-      padding: 10px 16px;
-      font-size: 16px;
+    /* Wider input columns */
+    .cow-cell {
+      width: 100px;
+      max-width: 100px;
+      padding: 4px;
+      box-sizing: border-box;
     }
   
+    .cow-cell input[type="number"] {
+      width: 100%;
+      font-size: 13px;
+      text-align: center;
+      padding: 4px;
+      box-sizing: border-box;
+      border: none;
+    }
+  
+    .cow-cell input[type="number"]::-webkit-inner-spin-button,
+    .cow-cell input[type="number"]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+  
+    /* Hover effect */
     .hover-row {
       background-color: #f5faff;
     }
@@ -55,67 +113,54 @@
     .hover-col {
       background-color: #f5faff;
     }
-
-    .table-scroll {
-      max-height: 600px;
-      overflow-y: auto;
-      border: 1px solid #ccc;
+  
+    /* Inputs & controls above table */
+    select, input[type="text"] {
+      margin: 5px 10px 15px 0;
+      padding: 5px;
+      font-size: 14px;
+    }
+  
+    button {
+      margin-top: 20px;
+      padding: 10px 16px;
+      font-size: 16px;
     }
 
-    /* Sticky top row (Taureaux, Taurillons, GT...) */
-    thead tr:first-child th {
+    /* Make first column sticky for BOTH the top header and the row headers */
+    thead th:first-child {
       position: sticky;
       top: 0;
+      left: 0;
       background: white;
-      z-index: 3;
+      z-index: 5; /* higher than other headers */
+      min-width: 180px;
+      text-align: left;
+      padding-left: 8px;
     }
 
-    /* Sticky second row (age values like 6, 7, etc.) */
-    thead tr:nth-child(2) th {
-      position: sticky;
-      top: 28px; /* match the exact height of the first row */
-      background: white;
-      z-index: 2;
-    }
-
-    thead tr:first-child th,
-    thead tr:nth-child(2) th {
-      height: 28px;
-      line-height: 28px;
-    }
-
-    thead th:first-child,
+    /* First column of body */
     tbody td:first-child {
       position: sticky;
       left: 0;
       background: white;
-      z-index: 4;
+      z-index: 2;
+      min-width: 180px;
+      text-align: left;
+      padding-left: 8px;
     }
 
-    /* Wider columns */
-    td, th {
-      min-width: 80px; /* enforce wider layout */
-    }
 
-    /* Inputs */
-    input[type="number"] {
-      width: 100%;
-      font-size: 13px;
-      text-align: center;
-      padding: 4px;
-      box-sizing: border-box;
-    }
 
-    input[type="number"]::-webkit-inner-spin-button,
-    input[type="number"]::-webkit-outer-spin-button {
-      -webkit-appearance: none; /* Chrome, Safari */
-      margin: 0;
-    }
 
 
 
 
   </style>
+  
+
+
+
   
 </head>
 <body>
@@ -228,6 +273,7 @@
 
     columns.forEach((_, colIdx) => {
       const cell = document.createElement("td");
+      cell.classList.add("cow-cell"); // ✅ this is new
       const input = document.createElement("input");
       input.type = "number";
       input.min = 0;
@@ -238,6 +284,7 @@
       cell.appendChild(input);
       row.appendChild(cell);
     });
+
 
     tbody.appendChild(row);
   });
@@ -314,6 +361,8 @@
       console.error("❌ Network error:", err);
       alert("❌ Network error: " + err.message);
     });
+
+  
 
 
   }

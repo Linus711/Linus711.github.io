@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Ranch Cow Tracker</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+      max-width: 100%;
+      overflow-x: auto;
+    }
+  
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      table-layout: fixed;
+    }
+  
+    th, td {
+      border: 1px solid #999;
+      text-align: center;
+      padding: 4px;
+      font-size: 13px;
+    }
+  
+    th {
+      position: sticky;
+      top: 0;
+      background: #fff;
+      z-index: 2;
+    }
+  
+    th[rowspan="2"] {
+      width: 150px;
+      text-align: left;
+    }
+
+  
+    select, input[type="text"] {
+      margin: 5px 10px 15px 0;
+      padding: 5px;
+    }
+  
+    button {
+      margin-top: 20px;
+      padding: 10px 16px;
+      font-size: 16px;
+    }
+  
+    .hover-row {
+      background-color: #f5faff;
+    }
+  
+    .hover-col {
+      background-color: #f5faff;
+    }
+
+    .table-scroll {
+      max-height: 600px;
+      overflow-y: auto;
+      border: 1px solid #ccc;
+    }
+
+    /* Sticky top row (Taureaux, Taurillons, GT...) */
+    thead tr:first-child th {
+      position: sticky;
+      top: 0;
+      background: white;
+      z-index: 3;
+    }
+
+    /* Sticky second row (age values like 6, 7, etc.) */
+    thead tr:nth-child(2) th {
+      position: sticky;
+      top: 28px; /* match the exact height of the first row */
+      background: white;
+      z-index: 2;
+    }
+
+    thead tr:first-child th,
+    thead tr:nth-child(2) th {
+      height: 28px;
+      line-height: 28px;
+    }
+
+    thead th:first-child,
+    tbody td:first-child {
+      position: sticky;
+      left: 0;
+      background: white;
+      z-index: 4;
+    }
+
+    /* Wider columns */
+    td, th {
+      min-width: 80px; /* enforce wider layout */
+    }
+
+    /* Inputs */
+    input[type="number"] {
+      width: 100%;
+      font-size: 13px;
+      text-align: center;
+      padding: 4px;
+      box-sizing: border-box;
+    }
+
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+      -webkit-appearance: none; /* Chrome, Safari */
+      margin: 0;
+    }
+
+
+
+
+  </style>
+  
+</head>
+<body>
+
+<h2>Ranch Cow Tracker</h2>
+
+<!-- Form Controls -->
+<label>Entity:
+  <select id="entity">
+    <option>Grelka</option>
+    <option>PHL</option>
+  </select>
+<label>Section:
+  <select id="section">
+    <option>Biano I</option>
+    <option>Biano II</option>
+    <option>Katongola</option>
+    <option>Luweke</option>
+    <option>Kafubu</option>
+  </select>
+</label>
+<label>Mois:
+  <select id="month">
+    <option>Janvier</option><option>Février</option><option>Mars</option>
+    <option>Avril</option><option>Mai</option><option>Juin</option>
+    <option>Juillet</option><option>Août</option><option>Septembre</option>
+    <option>Octobre</option><option>Novembre</option><option>Décembre</option>
+  </select>
+</label>
+<label>Semaine:
+  <select id="week">
+    <option>1</option><option>2</option><option>3</option>
+    <option>4</option><option>5</option>
+  </select>
+</label>
+
+<!-- Table Structure -->
+
+<div class="table-scroll">
+  <table id="cowGrid">
+    <thead>
+      <tr>
+        <th rowspan="2">Event</th>
+        <th colspan="6">Taureaux</th>
+        <th colspan="9">Taurillons</th>
+        <th colspan="2">GT</th>
+        <th colspan="1">G</th>
+        <th colspan="1">C</th>
+        <th colspan="6">Bouvillons</th>
+        <th colspan="3">Génisses</th>
+        <th colspan="2">VM</th>
+        <th colspan="2">VF</th>
+        <th>B</th>
+        <th>Total</th>
+      </tr>
+      <tr>
+        <th>6</th><th>7</th><th>8</th><th>9</th><th>0</th><th>1</th>
+        <th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th><th>0</th>
+        <th>1</th><th>2</th>
+        <th>R</th>
+        <th>B</th>
+        <th>9</th><th>0</th><th>1</th><th>2</th><th>3</th><th>4</th>
+        <th>2</th><th>3</th><th>4</th>
+        <th>4</th><th>5</th>
+        <th>4</th><th>5</th>
+        <th>T</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody id="gridBody"></tbody>
+  </table>
+</div>
+
+<button onclick="downloadJSON()">Download JSON</button>
+
+<script>
+   const columns = [
+  "Taureaux 6", "Taureaux 7", "Taureaux 8", "Taureaux 9", "Taureaux 0", "Taureaux 1",
+  "Taurillons 2", "Taurillons 3", "Taurillons 4", "Taurillons 5", "Taurillons 6", "Taurillons 7", "Taurillons 8", "Taurillons 9", "Taurillons 0",
+  "GT 1", "GT 2",
+  "G R", "G B",
+  "C 9", "C 0",
+  "Bouvillons 1", "Bouvillons 2", "Bouvillons 3", "Bouvillons 4",
+  "Génisses 2", "Génisses 3", "Génisses 4",
+  "VM 4", "VM 5",
+  "VF 4", "VF 5",
+  "B T", "Total"
+];
+
+
+  const events = [
+    "Début de Semaine", "Naissances", "Retrouvé", "TDC", "TF PHL / Katongola", "TFSn",
+    "Section 1", "Section 2", "Section 3", "Régularisation", "Maladie",
+    "  Trypanosomose", "  Anaplasmose", "  Verminoses", "  Coccidiose", "  Cachexie", "  TBC",
+    "  Pasteurellose", "  Affections pulm.", "  Otite", "  Dengue", "  Diverses mdies",
+    "ACCIDENTS", "  Orph/abandon", "  Acc.de vêlage", "  Fauve", "  Foudre", "  Serpent",
+    "  Intoxication", "  Embourbement", "  Noyade", "  Traumatisme", "  Non diagnostiqué", "  Divers",
+    "Disparition", "Vols", "Dons", "Travaux", "Abattages", "Ventes 1", "Ventes 2",
+    "TDC", "TF PHL / Katongola", "TFSn", "Section 1", "Section 2", "Section 3", "Régularisation", "Fin de Semaine"
+  ];
+
+  const tbody = document.getElementById("gridBody");
+
+  events.forEach((eventName, rowIdx) => {
+    const row = document.createElement("tr");
+    const labelCell = document.createElement("td");
+    labelCell.textContent = eventName;
+    labelCell.style.textAlign = "left";
+    row.appendChild(labelCell);
+
+    columns.forEach((_, colIdx) => {
+      const cell = document.createElement("td");
+      const input = document.createElement("input");
+      input.type = "number";
+      input.min = 0;
+      input.dataset.row = rowIdx;
+      input.dataset.col = colIdx;
+      input.onmouseover = () => highlight(rowIdx, colIdx);
+      input.onmouseout = removeHighlight;
+      cell.appendChild(input);
+      row.appendChild(cell);
+    });
+
+    tbody.appendChild(row);
+  });
+
+  function highlight(rowIdx, colIdx) {
+    const rows = document.querySelectorAll("#cowGrid tr");
+    for (let r = 2; r < rows.length; r++) {
+      rows[r].cells[colIdx + 1].classList.add("hover-col");
+    }
+    rows[rowIdx + 2].classList.add("hover-row");
+  }
+
+  function removeHighlight() {
+    document.querySelectorAll(".hover-col, .hover-row").forEach(el =>
+      el.classList.remove("hover-col", "hover-row")
+    );
+  }
+
+  function downloadJSON() {
+    const inputs = document.querySelectorAll('input[type="number"]');
+    const data = [];
+
+    const meta = {
+      entity: document.getElementById("entity").value,
+      section: document.getElementById("section").value,
+      month: document.getElementById("month").value,
+      week: document.getElementById("week").value,
+      entries: []
+    };
+
+    inputs.forEach(input => {
+      const val = input.value;
+      if (val !== '') {
+        const cow = columns[parseInt(input.dataset.col)];
+        const event = events[parseInt(input.dataset.row)];
+        data.push({ cow, event, quantity: parseInt(val) });
+      }
+    });
+
+    if (!meta.entity || !meta.section || !meta.month || !meta.week) {
+      alert("Please fill Entity, Section, Month, and Week.");
+      return;
+    }
+
+    meta.entries = data;
+
+    const blob = new Blob([JSON.stringify(meta, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `cow_data_${meta.entity}_${meta.section}_W${meta.week}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+</script>
+
+</body>
+</html>

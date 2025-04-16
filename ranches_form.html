@@ -346,9 +346,8 @@
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 
-    fetch("https://script.google.com/macros/s/AKfycbzcN6yboDHdlPKCl0SMmxN9TLqcrdqdhEWxKP9Sot-huaVI7GLlrfvn64a3EYOmGJ4Vgw/exec", {
+    fetch("https://script.google.com/macros/s/AKfycbzF3vn9IR4J6ZznIwgP_oTfIyhN44u9PNVYFOWXW1jJeEDvkO03VZboGO0uHbRsEfBYgQ/exec", {
       method: "POST",
-      mode: "no-cors",
       headers: {
         "Content-Type": "text/plain;charset=utf-8"  // 🔑 This avoids CORS preflight
       },

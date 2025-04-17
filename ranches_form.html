@@ -346,13 +346,12 @@
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 
-    fetch("https://script.google.com/macros/s/AKfycbzF3vn9IR4J6ZznIwgP_oTfIyhN44u9PNVYFOWXW1jJeEDvkO03VZboGO0uHbRsEfBYgQ/exec", {
+    fetch("https://script.google.com/macros/s/AKfycbwZ63HDPieA7opdF-GXqL-6It-YsixpPgVI1d48MSn2YzWa21q610uni3l8wCuH74IA-w/exec", {
       method: "POST",
       headers: {
         "Content-Type": "text/plain;charset=utf-8"
       },
       body: JSON.stringify(meta),
-      mode: "no-cors",
       redirect: "follow"
     })
     .then(() => {

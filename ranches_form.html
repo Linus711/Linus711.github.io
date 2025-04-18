@@ -3,7 +3,7 @@
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta charset="UTF-8">
-  <title>Ranches Data Collection per Section</title>
+  <title>Ranches Data Collection</title>
   <style>
     body {
       font-family: sans-serif;
@@ -164,13 +164,11 @@
   </style>
   
 
-
-
   
 </head>
 <body>
 
-<h2>Ranches Data Collection per Section</h2>
+<h2>Ranches Data Collection</h2>
 
 <!-- Form Controls -->
 <label>Entity:
@@ -346,21 +344,29 @@
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 
-    fetch("https://script.google.com/macros/s/AKfycbwZ63HDPieA7opdF-GXqL-6It-YsixpPgVI1d48MSn2YzWa21q610uni3l8wCuH74IA-w/exec", {
+    // Convert payload to URL-encoded form format
+    const encoded = `data=${encodeURIComponent(JSON.stringify(meta))}`;
+
+    fetch("https://script.google.com/macros/s/AKfycbwXUY6PlEup2gN00l-SpLYWwmzhj8MxSEhNtUw-wpA8i1BlRjb-tFuYOn-qvAUYwvKfmw/exec", {
       method: "POST",
       headers: {
-        "Content-Type": "text/plain;charset=utf-8"
+        "Content-Type": "application/x-www-form-urlencoded"
       },
-      body: JSON.stringify(meta),
-      redirect: "follow"
+      body: encoded
     })
-    .then(() => {
+    .then(response => {
+      console.log("✅ Response status:", response.status);
+      return response.text();
+    })
+    .then(result => {
+      console.log("📥 Server response:", result);
       alert("✅ Data submitted to Google Sheet!");
     })
     .catch(err => {
       console.error("❌ Network error:", err);
       alert("❌ Submission failed: " + err.message);
     });
+
 
   }
 

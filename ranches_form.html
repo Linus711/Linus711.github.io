@@ -3,7 +3,7 @@
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta charset="UTF-8">
-  <title>Ranches Data Collection</title>
+  <title>Ranches Section Data Collection</title>
   <style>
     body {
       font-family: sans-serif;
@@ -168,7 +168,7 @@
 </head>
 <body>
 
-<h2>Ranches Data Collection</h2>
+<h2>Ranches Section Data Collection</h2>
 
 <!-- Form Controls -->
 <label>Entity:
@@ -238,6 +238,8 @@
 </div>
 
 <button onclick="downloadJSON()">Download JSON</button>
+<div id="debug" style="white-space: pre-wrap; font-family: monospace; background: #f9f9f9; border: 1px solid #ccc; padding: 8px; margin-top: 12px;"></div>
+
 
 <script>
    const columns = [
@@ -347,28 +349,41 @@
     // Convert payload to URL-encoded form format
     const encoded = `data=${encodeURIComponent(JSON.stringify(meta))}`;
 
+    debugLog("📤 Sending data to:");
+    debugLog("📦 Payload: " + JSON.stringify(meta, null, 2));
+
     fetch("https://script.google.com/macros/s/AKfycbwXUY6PlEup2gN00l-SpLYWwmzhj8MxSEhNtUw-wpA8i1BlRjb-tFuYOn-qvAUYwvKfmw/exec", {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded"
       },
-      body: encoded
+      body: encoded,
+      redirect: "follow" // or try "manual" to test behavior
     })
     .then(response => {
-      console.log("✅ Response status:", response.status);
-      return response.text();
+      debugLog("✅ Response status: " + response.status);
+      debugLog("📍 Final URL: " + response.url);
+      return response.text(); // you can also try response.clone().text()
     })
     .then(result => {
-      console.log("📥 Server response:", result);
+      debugLog("📥 Server response: " + result);
       alert("✅ Data submitted to Google Sheet!");
     })
     .catch(err => {
-      console.error("❌ Network error:", err);
+      debugLog("❌ Network error: " + err.message);
       alert("❌ Submission failed: " + err.message);
     });
 
 
+
   }
+
+  function debugLog(message) {
+    const debugDiv = document.getElementById("debug");
+    const timestamp = new Date().toISOString().split("T")[1];
+    debugDiv.textContent += `[${timestamp}] ${message}\n`;
+  }
+
 
 
 

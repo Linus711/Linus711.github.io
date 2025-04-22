@@ -3,7 +3,7 @@
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta charset="UTF-8">
-  <title>Ranches Section Data Collection</title>
+  <title>Ranches Data Collection</title>
   <style>
     body {
       font-family: sans-serif;
@@ -157,9 +157,19 @@
       z-index: 5; /* higher than other sticky headers */
     }
 
+    .focus-row {
+      background-color: #8fb2ca !important;
+    }
 
+    .focus-col {
+      background-color: #8fb2ca !important;
+    }
 
-
+    .invalid-parent {
+      background-color: #ffe6e6;
+      border: 2px solid red;
+    }
+    
 
   </style>
   
@@ -168,7 +178,7 @@
 </head>
 <body>
 
-<h2>Ranches Section Data Collection</h2>
+<h2>Ranches Data Collection</h2>
 
 <!-- Form Controls -->
 <label>Entity:
@@ -176,15 +186,29 @@
     <option>Grelka</option>
     <option>PHL</option>
   </select>
-<label>Section:
-  <select id="section">
-    <option>Biano I</option>
-    <option>Biano II</option>
-    <option>Katongola</option>
-    <option>Luweke</option>
-    <option>Kafubu</option>
-  </select>
-</label>
+  <label>Section:
+    <select id="section">
+      <option>Katentania</option>
+      <option>Biano 2</option>
+      <option>Shishinkwa</option>
+      <option>Malambwe/Hôpital</option>
+      <option>Mukishi</option>
+      <option>Luniemu</option>
+      <option>Mudidie</option>
+      <option>Mondoie</option>
+      <option>Lupete</option>
+      <option>Muntobwe</option>
+      <option>Luania</option>
+      <option>Lutuay</option>
+      <option>Hendelet</option>
+      <option>Kankundwe</option>
+      <option>Kelambwe</option>
+      <option>Makanza</option>
+      <option>Kindele</option>
+      <option>Tshiongwe</option>
+      <option>Mushindji</option>
+    </select>
+  </label>
 <label>Mois:
   <select id="month">
     <option>Janvier</option><option>Février</option><option>Mars</option>
@@ -217,7 +241,6 @@
         <th colspan="2">VM</th>
         <th colspan="2">VF</th>
         <th>B</th>
-        <th>Total</th>
       </tr>
       <tr>
         <th>6</th><th>7</th><th>8</th><th>9</th><th>0</th><th>1</th>
@@ -230,15 +253,13 @@
         <th>4</th><th>5</th>
         <th>4</th><th>5</th>
         <th>T</th>
-        <th></th>
       </tr>
     </thead>
     <tbody id="gridBody"></tbody>
   </table>
 </div>
 
-<button onclick="downloadJSON()">Download JSON</button>
-<div id="debug" style="white-space: pre-wrap; font-family: monospace; background: #f9f9f9; border: 1px solid #ccc; padding: 8px; margin-top: 12px;"></div>
+<button onclick="downloadJSON()">Save and Upload</button>
 
 
 <script>
@@ -252,19 +273,19 @@
   "Génisses 2", "Génisses 3", "Génisses 4",
   "VM 4", "VM 5",
   "VF 4", "VF 5",
-  "B T", "Total"
+  "B T"
 ];
 
 
   const events = [
-    "Début de Semaine", "Naissances", "Retrouvé", "TDC", "TF PHL / Katongola", "TFSn",
-    "Section 1", "Section 2", "Section 3", "Régularisation", "Maladie",
+    "Début de Semaine", "Naissances", "Retrouvé", "TDC", "TFSn",
+    "Régularisation", "Maladie",
     "  Trypanosomose", "  Anaplasmose", "  Verminoses", "  Coccidiose", "  Cachexie", "  TBC",
     "  Pasteurellose", "  Affections pulm.", "  Otite", "  Dengue", "  Diverses mdies",
     "ACCIDENTS", "  Orph/abandon", "  Acc.de vêlage", "  Fauve", "  Foudre", "  Serpent",
     "  Intoxication", "  Embourbement", "  Noyade", "  Traumatisme", "  Non diagnostiqué", "  Divers",
     "Disparition", "Vols", "Dons", "Travaux", "Abattages", "Ventes 1", "Ventes 2",
-    "TDC", "TF PHL / Katongola", "TFSn", "Section 1", "Section 2", "Section 3", "Régularisation", "Fin de Semaine"
+    "TDC",  "TFSn",  "Régularisation", "Fin de Semaine"
   ];
 
   const tbody = document.getElementById("gridBody");
@@ -274,6 +295,19 @@
     const labelCell = document.createElement("td");
     labelCell.textContent = eventName;
     labelCell.style.textAlign = "left";
+
+    const isSubMaladie = rowIdx > events.indexOf("Maladie") && rowIdx < events.indexOf("ACCIDENTS");
+    const isSubAccidents = rowIdx > events.indexOf("ACCIDENTS") && rowIdx < events.indexOf("Disparition");
+
+    if (isSubMaladie || isSubAccidents) {
+      // Subcategories: indented but not bold
+      labelCell.style.paddingLeft = "24px";
+      labelCell.style.fontWeight = "normal";
+    } else {
+      // Main categories: bold
+      labelCell.style.fontWeight = "bold";
+    }
+
     row.appendChild(labelCell);
 
     columns.forEach((_, colIdx) => {
@@ -286,6 +320,14 @@
       input.dataset.col = colIdx;
       input.onmouseover = () => highlight(rowIdx, colIdx);
       input.onmouseout = removeHighlight;
+      input.onfocus = () => applyFocusHighlight(rowIdx, colIdx);
+      input.onblur = removeFocusHighlight;
+      input.oninput = () => {
+        validateParentRowSum("Maladie", "  Trypanosomose", "ACCIDENTS");
+        validateParentRowSum("ACCIDENTS", "  Orph/abandon", "Disparition");
+      };
+
+
       cell.appendChild(input);
       row.appendChild(cell);
     });
@@ -295,94 +337,144 @@
   });
 
   function highlight(rowIdx, colIdx) {
-    const rows = document.querySelectorAll("#cowGrid tr");
-    for (let r = 2; r < rows.length; r++) {
-      rows[r].cells[colIdx + 1].classList.add("hover-col");
+      const rows = document.querySelectorAll("#cowGrid tr");
+      for (let r = 2; r < rows.length; r++) {
+        rows[r].cells[colIdx + 1].classList.add("hover-col");
+      }
+      rows[rowIdx + 2].classList.add("hover-row");
     }
-    rows[rowIdx + 2].classList.add("hover-row");
-  }
 
   function removeHighlight() {
     document.querySelectorAll(".hover-col, .hover-row").forEach(el =>
       el.classList.remove("hover-col", "hover-row")
     );
-  }
-
-  function downloadJSON() {
-    const inputs = document.querySelectorAll('input[type="number"]');
-    const data = [];
-
-    const meta = {
-      entity: document.getElementById("entity").value,
-      section: document.getElementById("section").value,
-      month: document.getElementById("month").value,
-      week: document.getElementById("week").value,
-      entries: []
-    };
-
-    inputs.forEach(input => {
-      const val = input.value;
-      if (val !== '') {
-        const cow = columns[parseInt(input.dataset.col)];
-        const event = events[parseInt(input.dataset.row)];
-        data.push({ cow, event, quantity: parseInt(val) });
-      }
-    });
-
-    if (!meta.entity || !meta.section || !meta.month || !meta.week) {
-      alert("Please fill Entity, Section, Month, and Week.");
-      return;
     }
 
-    meta.entries = data;
+    function applyFocusHighlight(rowIdx, colIdx) {
+      const rows = document.querySelectorAll("#cowGrid tr");
+      for (let r = 2; r < rows.length; r++) {
+        rows[r].cells[colIdx + 1].classList.add("focus-col");
+      }
+      rows[rowIdx + 2].classList.add("focus-row");
+    }
 
-    const blob = new Blob([JSON.stringify(meta, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `cow_data_${meta.entity}_${meta.section}_W${meta.week}.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    function removeFocusHighlight() {
+      document.querySelectorAll(".focus-col, .focus-row").forEach(el =>
+        el.classList.remove("focus-col", "focus-row")
+      );
+    }
 
-    // Convert payload to URL-encoded form format
-    const encoded = `data=${encodeURIComponent(JSON.stringify(meta))}`;
+    function validateParentRowSum(parentLabel, startSubLabel, endSubLabel) {
+      const parentRowIdx = events.indexOf(parentLabel);
+      const startIdx = events.indexOf(startSubLabel);
+      const endIdx = events.indexOf(endSubLabel);
+      const totalCols = columns.length;
+      let isValid = true;
 
-    debugLog("📤 Sending data to:");
-    debugLog("📦 Payload: " + JSON.stringify(meta, null, 2));
+      for (let col = 0; col < totalCols; col++) {
+        let subSum = 0;
 
-    fetch("https://script.google.com/macros/s/AKfycbwXUY6PlEup2gN00l-SpLYWwmzhj8MxSEhNtUw-wpA8i1BlRjb-tFuYOn-qvAUYwvKfmw/exec", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded"
-      },
-      body: encoded,
-      redirect: "follow" // or try "manual" to test behavior
-    })
-    .then(response => {
-      debugLog("✅ Response status: " + response.status);
-      debugLog("📍 Final URL: " + response.url);
-      return response.text(); // you can also try response.clone().text()
-    })
-    .then(result => {
-      debugLog("📥 Server response: " + result);
-      alert("✅ Data submitted to Google Sheet!");
-    })
-    .catch(err => {
-      debugLog("❌ Network error: " + err.message);
-      alert("❌ Submission failed: " + err.message);
-    });
+        for (let r = startIdx; r < endIdx; r++) {
+          const subInput = document.querySelector(`input[data-row="${r}"][data-col="${col}"]`);
+          subSum += parseInt(subInput.value) || 0;
+        }
+
+        const parentInput = document.querySelector(`input[data-row="${parentRowIdx}"][data-col="${col}"]`);
+        const parentVal = parseInt(parentInput.value) || 0;
+
+        if (parentVal !== subSum) {
+          parentInput.classList.add("invalid-parent");
+          isValid = false;
+        } else {
+          parentInput.classList.remove("invalid-parent");
+        }
+      }
+
+      return isValid;
+    }
 
 
 
-  }
 
-  function debugLog(message) {
-    const debugDiv = document.getElementById("debug");
-    const timestamp = new Date().toISOString().split("T")[1];
-    debugDiv.textContent += `[${timestamp}] ${message}\n`;
-  }
+    function downloadJSON() {
+      const inputs = document.querySelectorAll('input[type="number"]');
+      const data = [];
+
+      const meta = {
+        entity: document.getElementById("entity").value,
+        section: document.getElementById("section").value,
+        month: document.getElementById("month").value,
+        week: document.getElementById("week").value,
+        entries: []
+      };
+
+      // Basic input validation: highlight invalid numeric fields
+      let inputValid = true;
+      inputs.forEach(input => {
+        const val = input.value;
+        if (val && (!/^\d+$/.test(val) || parseInt(val) < 0)) {
+          input.classList.add("invalid");
+          inputValid = false;
+        } else {
+          input.classList.remove("invalid");
+        }
+      });
+
+      // Validate parent row sums
+      const isMaladieValid = validateParentRowSum("Maladie", "  Trypanosomose", "ACCIDENTS");
+      const isAccidentsValid = validateParentRowSum("ACCIDENTS", "  Orph/abandon", "Disparition");
+
+      // Prevent submission if any validation fails
+      if (!meta.entity || !meta.section || !meta.month || !meta.week) {
+        alert("❌ Please fill Entity, Section, Month, and Week.");
+        return;
+      }
+
+      if (!inputValid || !isMaladieValid || !isAccidentsValid) {
+        alert("❌ Please fix the highlighted errors before submitting.\n\n- Make sure 'Maladie' and 'Accidents' match their subcategories\n- Only enter non-negative whole numbers");
+        return;
+      }
+
+      // Build data
+      inputs.forEach(input => {
+        const val = input.value;
+        if (val !== '') {
+          const cow = columns[parseInt(input.dataset.col)];
+          const event = events[parseInt(input.dataset.row)];
+          data.push({ cow, event, quantity: parseInt(val) });
+        }
+      });
+
+      meta.entries = data;
+
+      // Download local JSON file
+      const blob = new Blob([JSON.stringify(meta, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `cow_data_${meta.entity}_${meta.section}_W${meta.week}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      // Submit to Google Sheet
+      const encoded = `data=${encodeURIComponent(JSON.stringify(meta))}`;
+
+      fetch("https://script.google.com/macros/s/AKfycbwXUY6PlEup2gN00l-SpLYWwmzhj8MxSEhNtUw-wpA8i1BlRjb-tFuYOn-qvAUYwvKfmw/exec", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: encoded
+      })
+      .then(() => {
+        alert("✅ Data submitted to Google Sheet!");
+      })
+      .catch(err => {
+        alert("❌ Submission failed: " + err.message);
+      });
+    }
 
 
 

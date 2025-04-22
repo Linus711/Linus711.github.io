@@ -299,8 +299,15 @@
       // Force desktop layout
       element.classList.add("print-layout");
 
+      const establishment = document.getElementById("establishment").value.trim().replace(/\s+/g, '-');
+      const productName = document.getElementById("productName").value.trim().replace(/\s+/g, '-');
+      const orderDate = document.getElementById("orderDate").value;
+
+      const fileName = `${establishment || 'establishment'}_${productName || 'product'}_${orderDate || 'date'}.pdf`;  
+
+
       const opt = {
-        filename: 'client_specifications_sheet.pdf',
+        filename: fileName,
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: {
           scale: 2,

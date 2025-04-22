@@ -28,7 +28,7 @@
     .form-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 10px;
+      gap: 7px;
     }
     .form-group {
       flex: 1 1 45%;
@@ -94,8 +94,8 @@
     .weight-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 6px 12px;
-      margin-top: 10px;
+      gap: 2px 15px;
+      margin-top: 2px;
     }
     .weight-grid div {
       white-space: nowrap;
@@ -219,7 +219,6 @@
     </div>
 
     <div class="section">
-      <h4>Weight Range</h4>
       <p><strong>NB:</strong> Below items are always frozen</p>
       <div class="weight-grid">
         <div><strong>Entrecote:</strong></div>
@@ -247,13 +246,6 @@
   <script>
     function downloadAsPDF() {
       const element = document.getElementById("form-container");
-
-      const textareas = element.querySelectorAll("textarea");
-      textareas.forEach(t => {
-        t.style.overflow = 'visible';
-        t.style.height = 'auto';
-      });
-
       const opt = {
         filename: 'client_specifications_sheet.pdf',
         image: { type: 'jpeg', quality: 0.98 },
@@ -265,7 +257,7 @@
         },
         jsPDF: {
           unit: 'in',
-          format: 'a4',
+          format: [8.27, 11.69],
           orientation: 'portrait'
         },
         pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
